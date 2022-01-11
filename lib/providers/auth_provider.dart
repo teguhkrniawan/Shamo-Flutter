@@ -40,7 +40,7 @@ class AuthProvider with ChangeNotifier{
       // kembalikan nilai true
       _status = true;
 
-      print('Ubah status jadi $_status');
+      // print('Ubah status jadi $_status');
 
     } catch (e) {
       // print log exception yg dithrow pada auth_service.dart
@@ -48,7 +48,7 @@ class AuthProvider with ChangeNotifier{
 
       // kembalikan nilai false
       _status = false;
-      print('Ubah status jadi $_status');
+      // print('Ubah status jadi $_status');
     }
 
     return _status;

@@ -2,17 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shamo/providers/auth_provider.dart';
 import 'package:shamo/theme.dart';
+import 'package:shamo/widgets/loading_button.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+
+  // controller
+  TextEditingController nameController = TextEditingController(text: '');
+  TextEditingController usernameController = TextEditingController(text: '');
+  TextEditingController emailController = TextEditingController(text: '');
+  TextEditingController passwordController = TextEditingController(text: '');
+
+  // variabel status apakah dia loading atau gak
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-
-    // controller
-    TextEditingController nameController = TextEditingController(text: '');
-    TextEditingController usernameController = TextEditingController(text: '');
-    TextEditingController emailController = TextEditingController(text: '');
-    TextEditingController passwordController = TextEditingController(text: '');
 
     // provider
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
@@ -20,19 +30,37 @@ class SignUpPage extends StatelessWidget {
     // handle signup
     handleSignUp() async {
 
-       // print('click btn register');
+       // set state nilai isLoading jadi true saat button di tap
+       setState(() {
+         isLoading = true;
+       });
 
+       // menunggu return dari registrasi
        if(await authProvider.register(
          name: nameController.text,
          username: usernameController.text,
          email: emailController.text,
          password: passwordController.text
        )){
+         // navigasikan ke router /home
          Navigator.pushNamed(context, '/home');
-         print('Berhasil'); 
        }else{
-         print('Gagal');
+           ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: bgColor7,
+                content: Text("Sorry, Register Failed, try again!", style: primaryTextStyle.copyWith(
+                  fontSize: 12
+                ),)
+              )  
+            );
        }
+
+       // apabila kode await diatas sudah di eksekusi dan mereturn value maka
+       // lanjutkan kode dibawah berikut
+
+       setState(() {
+         isLoading = false;
+       });
     }
 
     // header widget
@@ -249,6 +277,7 @@ class SignUpPage extends StatelessWidget {
 
     // button sign up
     Widget SignUpButton(){
+
       return Container(
         height: 50,
         width: double.infinity,
@@ -313,7 +342,7 @@ class SignUpPage extends StatelessWidget {
                 fullNameInput(),
                 usernameInput(),
                 passwordInput(),
-                SignUpButton(),
+                isLoading ? LoadingButton() : SignUpButton(),
                 Spacer(),
                 footer()
               ],

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:shamo/helpers/network.dart';
 import 'package:shamo/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,8 +9,8 @@ import 'package:http/http.dart' as http;
 
 class AuthService{
 
-  // base url
-  String base_url = 'http://192.168.241.154:8000/api';
+  // base url from static variabel Helper Network
+  String base_url = Network.base_url;
 
   // async return function, register
   Future<UserModel> register({
@@ -39,11 +40,16 @@ class AuthService{
       endpoint_path,
       headers: headers,
       body: body
+    ).timeout(
+      Duration(seconds: 30),
+      onTimeout: (){
+        return http.Response('Timeout to connect internal server', 408);
+      }
     );
 
-    print(response.body);
+     // print(response.body);
 
-    if(response.statusCode == 200){
+     if(response.statusCode == 200){
       // ambil body dari key data
       var data = jsonDecode(response.body)['data'];
 
@@ -52,9 +58,14 @@ class AuthService{
       user.token = data['token_type'] +' '+ data['remember_token'];
 
       return user;
-    }else {
+    }
+    else if(response.statusCode == 408){
+      throw Exception('Request Timeout');
+    }
+    else {
       throw Exception('Gagal Register, '+response.statusCode.toString()+ ' Code Server Request Error');
     }
+
 
   } 
    
