@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:shamo/models/user_model.dart';
 import 'package:shamo/services/auth_service.dart';
@@ -5,6 +6,7 @@ import 'package:shamo/services/auth_service.dart';
 class AuthProvider with ChangeNotifier{
   
   UserModel _user;
+  String _exception;
 
   // getter
   UserModel get user => _user;
@@ -12,6 +14,15 @@ class AuthProvider with ChangeNotifier{
   // setter
   set user(UserModel user){
     _user = user;
+    notifyListeners();
+  }
+
+  // getter
+  String get exception => _exception;
+
+  // setter
+  set exception(String message){
+    _exception = message;
     notifyListeners();
   }
 
@@ -49,6 +60,40 @@ class AuthProvider with ChangeNotifier{
       // kembalikan nilai false
       _status = false;
       // print('Ubah status jadi $_status');
+    }
+
+    return _status;
+  }
+
+  // function sebuah kondisi apakah ekseskusi async login berhasil/tidak
+  Future<bool> login({
+    String email,
+    String password
+  }) async {
+
+    bool _status = false;
+
+    try {
+      // lakukan proses request data
+      UserModel userModel = await AuthService().login(
+        email: email,
+        password: password
+      );
+      
+      _user = userModel;
+
+      _status = true;
+    } catch (e) {
+     
+      if(e is Exception){
+        var msg = e.toString();
+
+        // Exception: Auth...
+        // mau ambil dari Auth...
+        exception = msg.substring(11);  
+      }
+
+      _status = false;
     }
 
     return _status;

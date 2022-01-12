@@ -1,10 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/providers/auth_provider.dart';
 import 'package:shamo/theme.dart';
+import 'package:shamo/widgets/loading_button.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
 
   @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  TextEditingController emailController = TextEditingController(text: '');
+
+  TextEditingController passController = TextEditingController(text: '');
+
+  bool _isLoading = false;
+
+  // overiding context
+  @override
   Widget build(BuildContext context) {
+
+    // provider
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    
+    handleSignIn() async{
+      setState(() {
+        _isLoading = true;
+      });
+
+      if(await authProvider.login(
+        email: emailController.text,
+        password: passController.text
+      )){
+        Navigator.pushNamed(context, '/home');
+      }
+      else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: bgColor7,
+            content: authProvider.exception == ""
+                ? Text('Sorry! Failed to login, try again', style: primaryTextStyle.copyWith(fontSize: 12))
+                : Text('${authProvider.exception}, please check your username or password', style: primaryTextStyle.copyWith(fontSize: 12))
+          )  
+        );
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
 
     // header widget
     Widget header(){
@@ -63,6 +108,7 @@ class SignInPage extends StatelessWidget {
                     Expanded(
                       child: TextFormField(
                         style: primaryTextStyle,
+                        controller: emailController,
                         decoration: InputDecoration.collapsed(
                           hintText: "Your Email Address",
                           hintStyle: thirdTextStyle
@@ -108,6 +154,7 @@ class SignInPage extends StatelessWidget {
                     Expanded(
                       child: TextFormField(
                         obscureText: true,
+                        controller: passController,
                         style: primaryTextStyle,
                         decoration: InputDecoration.collapsed(
                           hintText: "Your Password",
@@ -131,9 +178,7 @@ class SignInPage extends StatelessWidget {
         width: double.infinity,
         margin: EdgeInsets.only(top: 30),
         child: TextButton(
-          onPressed: (){
-            Navigator.pushNamed(context, '/home');
-          }, 
+          onPressed: handleSignIn, 
           style: TextButton.styleFrom(
             backgroundColor: primaryColor,
             shape: RoundedRectangleBorder(
@@ -190,7 +235,7 @@ class SignInPage extends StatelessWidget {
                 header(),
                 emailInput(),
                 passwordInput(),
-                SignInButton(),
+                _isLoading ? LoadingButton() : SignInButton(),
                 Spacer(),
                 footer()
               ],

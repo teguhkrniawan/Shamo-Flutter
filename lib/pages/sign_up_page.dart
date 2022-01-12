@@ -45,14 +45,14 @@ class _SignUpPageState extends State<SignUpPage> {
          // navigasikan ke router /home
          Navigator.pushNamed(context, '/home');
        }else{
-           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: bgColor7,
-                content: Text("Sorry, Register Failed, try again!", style: primaryTextStyle.copyWith(
-                  fontSize: 12
-                ),)
-              )  
-            );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: bgColor7,
+              content: Text("Sorry, Register Failed, try again!", style: primaryTextStyle.copyWith(
+                fontSize: 12
+              ),)
+            )  
+          );
        }
 
        // apabila kode await diatas sudah di eksekusi dan mereturn value maka
