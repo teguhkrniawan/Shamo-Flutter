@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:shamo/models/produk_model.dart';
+import 'package:shamo/pages/detail_product_page.dart';
 import 'package:shamo/theme.dart';
 
 class ProductTile extends StatelessWidget {
+
+  final ProdukModel produk;
+
+  ProductTile({
+    this.produk
+  });
   
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Navigator.pushNamed(context, '/detail-product');
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => DetailProduct(
+            produk: produk,
+          ))
+        );
       },
       child: Container(
         margin: EdgeInsets.only(
@@ -19,8 +32,8 @@ class ProductTile extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                'assets/shoes_hiking2.png',
+              child: Image.network(
+                '${produk.galleries[0].url}',
                 width: 120,
                 height: 120,
                 fit: BoxFit.cover,
@@ -32,22 +45,23 @@ class ProductTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Footbal',
+                    '${produk.category.namaKategori}',
                     style: secondaryTextStyle.copyWith(
                       fontSize: 12
                     ),
                   ),
                   SizedBox(height: 6,),
                   Text(
-                    'Terrex Urban Hiking Low Budget', 
+                    '${produk.name}', 
                       style: primaryTextStyle.copyWith(
                         fontSize: 16,
                         fontWeight: semibold
                       ),
+                    maxLines: 1,  
                     overflow: TextOverflow.ellipsis
                   ),
                   SizedBox(height: 6,),
-                  Text('Rp. 112K', style: priceTextStyle,)
+                  Text('\$${produk.price}', style: priceTextStyle,)
                 ],
               ),
             )

@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/models/produk_model.dart';
+import 'package:shamo/providers/wishlist_provider.dart';
 import 'package:shamo/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class DetailProduct extends StatefulWidget {
+
+  final ProdukModel produk;
+  DetailProduct({
+    this.produk
+  });
 
   @override
   State<DetailProduct> createState() => _DetailProductState();
 }
 
 class _DetailProductState extends State<DetailProduct> {
-
+  
   final List images = [
     'assets/shoes_running1.png',
     'assets/shoes_hiking2.png',
@@ -32,6 +40,9 @@ class _DetailProductState extends State<DetailProduct> {
 
   @override
   Widget build(BuildContext context) {
+
+    // wishlist provider
+    WishlistProvider wishlistProvider = Provider.of<WishlistProvider>(context);
 
     // widget dialog success
     Future<void> showSuccessDialog() async{
@@ -157,9 +168,9 @@ class _DetailProductState extends State<DetailProduct> {
             ),
           ),
           CarouselSlider(
-            items: images.map(
-                (element) => Image.asset(
-                  element,
+            items: widget.produk.galleries.map(
+                (element) => Image.network(
+                  element.url,
                   width: MediaQuery.of(context).size.width,
                   height: 300,
                   fit: BoxFit.contain,
@@ -176,7 +187,7 @@ class _DetailProductState extends State<DetailProduct> {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: images.map((element){
+            children: widget.produk.galleries.map((element){
               indexHeader++;
               return indicator(indexHeader);
             }).toList()
@@ -219,14 +230,14 @@ class _DetailProductState extends State<DetailProduct> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'TERREX URBAN LOW',
+                          '${widget.produk.name}',
                           style: primaryTextStyle.copyWith(
                             fontSize: 18,
                             fontWeight: semibold
                           )
                         ),
                         Text(
-                          'Hiking',
+                          '${widget.produk.category.namaKategori}',
                           style: secondaryTextStyle.copyWith(
                             fontSize: 12
                           )
@@ -236,11 +247,14 @@ class _DetailProductState extends State<DetailProduct> {
                   ),
                   GestureDetector(
                     onTap: (){
-                      setState(() {
-                        isWishlist = !isWishlist;
-                      });
+                      // setState(() {
+                      //   isWishlist = !isWishlist;
+                      // });
+
+                      wishlistProvider.setProduct(widget.produk);
+
                       ScaffoldMessenger.of(context).showSnackBar(
-                        isWishlist 
+                        wishlistProvider.isWishlist(widget.produk)
                           ? SnackBar(
                               backgroundColor: secondaryColor,
                               content: Text('Has beed added to your Wishlist')
@@ -253,7 +267,7 @@ class _DetailProductState extends State<DetailProduct> {
                       );
                     },
                     child: Image.asset(
-                      isWishlist ? 'assets/icon_enable_love.png' : 'assets/icon_disable_love.png', 
+                      wishlistProvider.isWishlist(widget.produk) ? 'assets/icon_enable_love.png' : 'assets/icon_disable_love.png', 
                       width: 46,
                     ),
                   )
@@ -283,7 +297,7 @@ class _DetailProductState extends State<DetailProduct> {
                     ),
                   ),
                   Text(
-                    'Rp. 129.000',
+                    '\$${widget.produk.price}',
                     style: priceTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semibold
@@ -306,7 +320,7 @@ class _DetailProductState extends State<DetailProduct> {
                 children: [
                   Text('Description', style: primaryTextStyle.copyWith(fontWeight: semibold),),
                   SizedBox(height: 12,),
-                  Text("Unpaved trails and mixed surfaces are easy when you have the traction and support you need. Casual enough for the daily commute.", style: primaryTextStyle.copyWith(fontSize: 12), textAlign: TextAlign.justify,)
+                  Text("${widget.produk.description.replaceAll('\r\n', ' ')}", style: primaryTextStyle.copyWith(fontSize: 12), textAlign: TextAlign.justify,)
                 ],
               ),
             ),
@@ -397,14 +411,16 @@ class _DetailProductState extends State<DetailProduct> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: bgColor6,
-      body: ListView(
-        children: [
-          header(),
-          content()
-        ],
-      )
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: bgColor6,
+        body: ListView(
+          children: [
+            header(),
+            content()
+          ],
+        )
+      ),
     );
   }
 }

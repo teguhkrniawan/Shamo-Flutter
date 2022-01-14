@@ -1,13 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/models/produk_model.dart';
+import 'package:shamo/models/user_model.dart';
+import 'package:shamo/providers/auth_provider.dart';
+import 'package:shamo/providers/product_provider.dart';
 import 'package:shamo/theme.dart';
 import 'package:shamo/widgets/product_card.dart';
 import 'package:shamo/widgets/product_tile.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+
+  bool _isLoading = false;
+  List<ProdukModel> listProduk = [];
+  
+  @override
+  void initState() {
+    handlePopularProduk();
+    super.initState();
+  }
+
+  handlePopularProduk() async {
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // get produk
+    await Provider.of<ProductProvider>(context, listen: false).getProducts();
+    
+    setState(() {
+      _isLoading = false;
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    // provider auth user
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user = authProvider.user;
+
+    // produk provider
+    ProductProvider produkProvider = Provider.of<ProductProvider>(context);
+
+    // widget Circular
+    Widget circularLoading(){
+      return Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: Center(
+          child: Container(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(
+                primaryTextColor
+              )
+            ),
+          ),
+        ),
+      );
+    }
 
     // widget header
     Widget header(){
@@ -23,11 +83,11 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Hello, Teguh', style: primaryTextStyle.copyWith(
+                  Text('Hello, ${user.nama}', style: primaryTextStyle.copyWith(
                     fontSize: 24,
                     fontWeight: semibold
                   ),),
-                  Text('@teguhkrniawan', style: thirdTextStyle.copyWith(
+                  Text('@${user.username}', style: thirdTextStyle.copyWith(
                     fontSize: 14,
                   ),)
                 ],
@@ -38,7 +98,7 @@ class HomePage extends StatelessWidget {
               height: 54,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                image: DecorationImage(image: AssetImage('assets/icon_user.png'))
+                image: DecorationImage(image: NetworkImage(user.profile_pict))
               ),
             )
           ],
@@ -187,11 +247,7 @@ class HomePage extends StatelessWidget {
       return Container(
         margin: EdgeInsets.only(top: 14),
         child: Column(
-          children: [
-            ProductTile(),
-            ProductTile(),
-            ProductTile(),
-          ],
+          children: produkProvider.listProduk.map((item) => ProductTile(produk: item,)).toList()
         ),
       );
     }
@@ -210,11 +266,7 @@ class HomePage extends StatelessWidget {
                 width: defaultMargin
               ),
               Row(
-                children: [
-                  ProductCard(),
-                  ProductCard(),
-                  ProductCard(),
-                ],
+                children: produkProvider.listProduk.map((item) => ProductCard(produk: item,)).toList()
               )
             ],
           ),
@@ -222,14 +274,23 @@ class HomePage extends StatelessWidget {
       );
     }
 
+    Widget body(){
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          popularProductTitle(),
+          popularProductItem(),
+          newArrivalTitle(),
+          newArivalsItem()
+        ],
+      );
+    }
+
     return ListView(
       children: [
         header(),
         categories(),
-        popularProductTitle(),
-        popularProductItem(),
-        newArrivalTitle(),
-        newArivalsItem()
+        _isLoading ? circularLoading() : body()
       ],
     );
   }

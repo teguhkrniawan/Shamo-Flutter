@@ -29,7 +29,7 @@ class UserModel{
   // model from JSON
   UserModel.fromJson(Map<String, dynamic> json){
     id = json['id'].toString();
-    nama = json['nama'];
+    nama = json['name'];
     email = json['email'];
     username = json['username'];
     role = json['role'];
@@ -44,7 +44,7 @@ class UserModel{
   Map<String, dynamic> toJson(){
     return {
       'id' : id,
-      'nama' : nama,
+      'name' : nama,
       'email' : email,
       'username' : username,
       'profile_photo_url' : profile_pict,

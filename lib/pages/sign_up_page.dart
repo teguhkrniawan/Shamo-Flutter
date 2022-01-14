@@ -43,7 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
          password: passwordController.text
        )){
          // navigasikan ke router /home
-         Navigator.pushNamed(context, '/home');
+         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
        }else{
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

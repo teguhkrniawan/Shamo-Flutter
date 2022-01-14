@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shamo/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -10,13 +11,36 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
 
+  // bool _globalIslogin = false;
+
+  Future<bool> getPrefsLogin() async{
+    final prefs = await SharedPreferences.getInstance();
+    final isLogin = prefs.getBool('isLogin');
+    if(isLogin == null){
+      return false;
+    }
+    return true;
+  }
+
   @override
   void initState() {
 
-    Timer(
-      Duration(seconds: 3),
-      () => Navigator.pushNamed(context, '/sign-in') 
-    );
+    getPrefsLogin().then((islogin) {
+      if(!islogin){
+        Timer(
+          Duration(seconds: 3),
+          () => Navigator.pushNamedAndRemoveUntil(context, ('/sign-in'), (route) => false)
+        );
+      }
+      else{
+        Timer(
+          Duration(seconds: 3),
+          () => Navigator.pushNamedAndRemoveUntil(context, ('/home'), (route) => false)
+        );
+      }
+    });
+    
+   
 
     super.initState();
   }

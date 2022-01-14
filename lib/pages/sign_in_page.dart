@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shamo/providers/auth_provider.dart';
 import 'package:shamo/theme.dart';
 import 'package:shamo/widgets/loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';  
 
 class SignInPage extends StatefulWidget {
 
@@ -11,11 +12,16 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  TextEditingController emailController = TextEditingController(text: '');
 
+  TextEditingController emailController = TextEditingController(text: '');  
   TextEditingController passController = TextEditingController(text: '');
 
-  bool _isLoading = false;
+  bool _isLoading = false; 
+
+  Future<void> setPref(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLogin',  status); 
+  }
 
   // overiding context
   @override
@@ -33,7 +39,8 @@ class _SignInPageState extends State<SignInPage> {
         email: emailController.text,
         password: passController.text
       )){
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        setPref(true);
       }
       else{
         ScaffoldMessenger.of(context).showSnackBar(

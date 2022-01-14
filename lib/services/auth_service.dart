@@ -55,8 +55,8 @@ class AuthService{
       var data = jsonDecode(response.body)['data'];
 
       // ambil dari body key data -> user
-      UserModel user = UserModel.fromJson(data['pelanggan']);
-      user.token = data['token_type'] +' '+ data['remember_token'];
+      UserModel user = UserModel.fromJson(data['user']);
+      user.token = data['token_type'] +' '+ data['access_token'];
 
       return user;
     }

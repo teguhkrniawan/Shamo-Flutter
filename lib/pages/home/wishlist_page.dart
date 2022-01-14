@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/providers/wishlist_provider.dart';
 import 'package:shamo/widgets/wishlist_tile.dart';
 
 import '../../theme.dart';
@@ -7,6 +9,9 @@ class WishlistPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // provider wishlist
+    WishlistProvider wishlistProvider = Provider.of<WishlistProvider>(context);
 
     // widget header
     Widget header(){
@@ -89,21 +94,28 @@ class WishlistPage extends StatelessWidget {
             horizontal: defaultMargin
           ),
           child: ListView(
-            children: [
-              WishlistTile(),
-              WishlistTile(),
-            ],
+            children: wishlistProvider.wishlist.map((produk) =>  WishlistTile(produk: produk,)).toList()
           ),
         ),
       );
     }
 
-    return Column(
-      children: [
-        header(),
-        // 
-        content()
-      ],
-    );
+    // apabila list wishlist tidak kosong
+    if(wishlistProvider.wishlist.isNotEmpty){
+        // maka tampilkan
+        return Column(
+          children: [
+            header(),
+            content()
+          ],
+        );
+    }else{
+         return Column(
+          children: [
+            header(),
+            emptyWishlist()
+          ],
+        );
+    }
   }
 }

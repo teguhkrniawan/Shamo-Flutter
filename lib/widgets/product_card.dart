@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:shamo/models/produk_model.dart';
+import 'package:shamo/pages/detail_product_page.dart';
 import 'package:shamo/theme.dart';
 
 class ProductCard extends StatelessWidget {
+
+  final ProdukModel produk;
+  ProductCard({
+    this.produk
+  });
   
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Navigator.pushNamed(context, '/detail-product');
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => DetailProduct(produk: produk,))
+        );
       },
       child: Container(
         width: 215,
@@ -25,8 +35,8 @@ class ProductCard extends StatelessWidget {
             SizedBox(
               height: 30,
             ),
-            Image.asset(
-              'assets/shoes_running1.png', 
+            Image.network(
+              produk.galleries[0].url, 
               width: 215, 
               height: 150,
               fit: BoxFit.cover,
@@ -39,7 +49,7 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hiking', 
+                    '${produk.category.namaKategori}', 
                     style: secondaryTextStyle.copyWith(
                       fontSize: 14,
                       fontWeight: reguler
@@ -48,15 +58,17 @@ class ProductCard extends StatelessWidget {
                   SizedBox(
                     height: 6,
                   ),
-                  Text('COURT VISION NEW 2.0', style: titleCard.copyWith(
-                    fontSize: 18,
-                    fontWeight: semibold
-                  ), overflow: TextOverflow.ellipsis,),
+                  Text('${produk.name}', 
+                    maxLines: 1,
+                    style: titleCard.copyWith(
+                      fontSize: 18,
+                      fontWeight: semibold
+                    ), overflow: TextOverflow.ellipsis,),
                   SizedBox(
                     height: 6,
                   ),
                   Text(
-                    'Rp. 129K',
+                    '\$'+produk.price.toString(),
                     style: priceTextStyle.copyWith(
                       fontSize: 14,
                       fontWeight: medium
